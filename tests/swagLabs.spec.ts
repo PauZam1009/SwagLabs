@@ -32,3 +32,20 @@ test('Login con credenciales inválidas', async ({ page }) => {
 
     });
 })
+
+test('Iniciar sesión y agregar productos al carrito', async ({ page }) => {
+    await test.step('Login válido', async () => {
+        await page.goto('');
+        await page.getByTestId('username').fill('standard_user');
+        await page.getByTestId('password').fill('secret_sauce');
+        await page.getByTestId('login-button').click();
+    })
+
+    await test.step('Agregar productos al carrito', async () => {
+        await page.getByTestId('add-to-cart-sauce-labs-backpack').click();
+        await page.getByTestId('add-to-cart-sauce-labs-onesie').click();
+
+        await expect(page.getByTestId('shopping-cart-badge')).toHaveText('2');
+    })
+    
+})
