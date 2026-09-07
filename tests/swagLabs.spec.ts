@@ -1,4 +1,6 @@
 import { expect, test } from './fixtures';
+import { InventoryPage } from './pages/InventoryPage';
+import { LoginPage } from './pages/LoginPage';
 
 test('Navegar a Swag Labs y validar el titulo ', async ({ page }) => {
     await test.step('Navegamos a Swag Labs', async () => {
@@ -10,11 +12,11 @@ test('Navegar a Swag Labs y validar el titulo ', async ({ page }) => {
 
 })
 test('Iniciar sesión con credenciales válidas', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+
     await test.step('Login válido', async () => {
         await page.goto('');
-        await page.getByTestId('username').fill('standard_user');
-        await page.getByTestId('password').fill('secret_sauce');
-        await page.getByTestId('login-button').click();
+        await loginPage.login('standard_user', 'secret_sauce');
 
         await expect(page).toHaveURL("https://www.saucedemo.com/inventory.html");
     });
@@ -22,14 +24,15 @@ test('Iniciar sesión con credenciales válidas', async ({ page }) => {
 });
 
 test('Login con credenciales inválidas', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+
     await test.step('Login inválido', async () => {
         await page.goto('');
-        await page.getByTestId('username').fill('paula_user');
-        await page.getByTestId('password').fill('secret_sauces');
-        await page.getByTestId('login-button').click();
+        await loginPage.login('Paula_zam', 'secret_saucess');
+
 
         await expect(page.getByTestId('error')).toHaveText('Epic sadface: Username and password do not match any user in this service');
-
+        
     });
 })
 
@@ -43,12 +46,14 @@ test('Agregar productos al carrito', async ({ loggedInPage }) => {
 })
 
 test('Realizar compra completa', async ({ loggedInPage }) => {
+    const inventoryPage = new InventoryPage(loggedInPage);
+    
     await test.step('Agregar 3 productos al carrito ', async () => {
-        await loggedInPage.getByTestId('add-to-cart-sauce-labs-backpack').click();
-        await loggedInPage.getByTestId('add-to-cart-sauce-labs-fleece-jacket').click();
-        await loggedInPage.getByTestId('add-to-cart-sauce-labs-onesie').click();
+        await inventoryPage.addProductToCart('sauce-labs-backpack');
+        await inventoryPage.addProductToCart('sauce-labs-fleece-jacket');
+        await inventoryPage.addProductToCart('sauce-labs-onesie');
 
-        await expect(loggedInPage.getByTestId('shopping-cart-badge')).toHaveText('3');
+        await expect(inventoryPage.cartBadge).toHaveText('3');
 
     });
 
