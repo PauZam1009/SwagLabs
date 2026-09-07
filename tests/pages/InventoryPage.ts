@@ -7,6 +7,7 @@ export class InventoryPage {
     readonly sortDropdown: Locator;
     readonly productPrices: Locator;
 
+
     constructor(page: Page) {
         this.page = page;
         this.cartBadge = page.getByTestId('shopping-cart-badge');

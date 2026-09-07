@@ -3,6 +3,7 @@ import { CartPage } from './pages/CartPage';
 import { InventoryPage } from './pages/InventoryPage';
 import { LoginPage } from './pages/LoginPage';
 import { CheckoutPage } from './pages/CheckoutPage';
+import { ProductDetailPage } from './pages/ProductDetailPage';
 
 test('Navegar a Swag Labs y validar el titulo ', async ({ page }) => {
     await test.step('Navegamos a Swag Labs', async () => {
@@ -39,11 +40,12 @@ test('Login con credenciales inválidas', async ({ page }) => {
 })
 
 test('Agregar productos al carrito', async ({ loggedInPage }) => {
+        const inventoryPage = new InventoryPage(loggedInPage);
     
-        await loggedInPage.getByTestId('add-to-cart-sauce-labs-backpack').click();
-        await loggedInPage.getByTestId('add-to-cart-sauce-labs-onesie').click();
+        await inventoryPage.addProductToCart('sauce-labs-backpack');
+        await inventoryPage.addProductToCart('sauce-labs-onesie');
 
-        await expect(loggedInPage.getByTestId('shopping-cart-badge')).toHaveText('2');
+        await expect(inventoryPage.cartBadge).toHaveText('2');
     
 })
 
@@ -82,21 +84,26 @@ test('Realizar compra completa', async ({ loggedInPage }) => {
 })
 
 test('Dar click en el producto Verificar detalle y precio', async ({ loggedInPage }) => {
-    await test.step('Descripción y Precio correcto', async () => {
-        await loggedInPage.getByTestId('item-4-title-link').click();
+    const inventoryPage = new InventoryPage(loggedInPage);
+    const productDetailPage = new ProductDetailPage(loggedInPage);
 
-        await expect (loggedInPage.getByTestId('inventory-item-desc')).toContainText('Sly Pack');
-        await expect (loggedInPage.getByTestId('inventory-item-price')).toHaveText('$29.99');
+    await test.step('Descripción y Precio correcto', async () => {
+        await inventoryPage.goToProductDetail(0);
+
+        await expect(productDetailPage.itemDesc).toContainText('bike at night');
+        await expect(productDetailPage.itemPrice).toHaveText('$9.99');
     })
     
 })
 
 test('Ordenar productos en el inventario de menor a mayor costo', async ({ loggedInPage }) => {
-    await test.step('Seleccionamos la opcíon de menor a mayor precio', async () => {
-        await loggedInPage.getByTestId('product-sort-container').selectOption('lohi');
+    const inventoryPage = new InventoryPage(loggedInPage);
 
-        await expect (loggedInPage.getByTestId('inventory-item-price').first()).toHaveText('$7.99');
-        await expect (loggedInPage.getByTestId('inventory-item-price').last()).toHaveText('$49.99');
+    await test.step('Seleccionamos la opcíon de menor a mayor precio', async () => {
+        await inventoryPage.sortProductsBy('lohi');
+
+        await expect (inventoryPage.productPrices.first()).toHaveText('$7.99');
+        await expect (inventoryPage.productPrices.last()).toHaveText('$49.99');
     })
     
 })
