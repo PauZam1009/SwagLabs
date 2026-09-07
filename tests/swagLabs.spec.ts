@@ -1,13 +1,15 @@
 import { expect, test } from './fixtures';
+import { CartPage } from './pages/CartPage';
 import { InventoryPage } from './pages/InventoryPage';
 import { LoginPage } from './pages/LoginPage';
+import { CheckoutPage } from './pages/CheckoutPage';
 
 test('Navegar a Swag Labs y validar el titulo ', async ({ page }) => {
     await test.step('Navegamos a Swag Labs', async () => {
         await page.goto('');
 
         await expect(page).toHaveTitle('Swag Labs');
-    });
+    }); 
 
 
 })
@@ -47,6 +49,8 @@ test('Agregar productos al carrito', async ({ loggedInPage }) => {
 
 test('Realizar compra completa', async ({ loggedInPage }) => {
     const inventoryPage = new InventoryPage(loggedInPage);
+    const cartPage = new CartPage(loggedInPage);
+    const checkoutPage = new CheckoutPage(loggedInPage);
     
     await test.step('Agregar 3 productos al carrito ', async () => {
         await inventoryPage.addProductToCart('sauce-labs-backpack');
@@ -57,22 +61,22 @@ test('Realizar compra completa', async ({ loggedInPage }) => {
 
     });
 
-    await test.step('Damos click en el carrito y hacemos checkout', async () => {
-        await loggedInPage.getByTestId('shopping-cart-link').click();
-        await loggedInPage.getByTestId('checkout').click();
+    await test.step('Ir al Checkout', async () => {
+
+        await inventoryPage.goToCart();
+        await cartPage.goToCheckout();
     });
     
     await test.step('Llenamos el formulario de envío', async () => {
-        await loggedInPage.getByTestId('firstName').fill('Paula');
-        await loggedInPage.getByTestId('lastName').fill('Zambrano');
-        await loggedInPage.getByTestId('postalCode').fill('08205');
+
+        await checkoutPage.fillCheckoutInfo('Paula', 'Zambrano', '08205');
         
     });
     await test.step('Finalizar compra', async () => {
-        await loggedInPage.getByTestId('continue').click();
-        await loggedInPage.getByTestId('finish').click();
+        await checkoutPage.clickContinue();
+        await checkoutPage.clickFinish();
 
-        await expect (loggedInPage.getByTestId('complete-header')).toHaveText('Thank you for your order!');
+        await expect (checkoutPage.confirmationMessage).toHaveText('Thank you for your order!');
     })
     
 })
