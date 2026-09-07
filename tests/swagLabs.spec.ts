@@ -70,7 +70,26 @@ test('Realizar compra completa', async ({ loggedInPage }) => {
         await expect (loggedInPage.getByTestId('complete-header')).toHaveText('Thank you for your order!');
     })
     
-    
+})
+
+test('Dar click en el producto Verificar detalle y precio', async ({ loggedInPage }) => {
+    await test.step('Descripción y Precio correcto', async () => {
+        await loggedInPage.getByTestId('item-4-title-link').click();
+
+        await expect (loggedInPage.getByTestId('inventory-item-desc')).toContainText('Sly Pack');
+        await expect (loggedInPage.getByTestId('inventory-item-price')).toHaveText('$29.99');
+    })
     
 })
+
+test('Ordenar productos en el inventario de menor a mayor costo', async ({ loggedInPage }) => {
+    await test.step('Seleccionamos la opcíon de menor a mayor precio', async () => {
+        await loggedInPage.getByTestId('product-sort-container').selectOption('lohi');
+
+        await expect (loggedInPage.getByTestId('inventory-item-price').first()).toHaveText('$7.99');
+        await expect (loggedInPage.getByTestId('inventory-item-price').last()).toHaveText('$49.99');
+    })
+    
+})
+
 
