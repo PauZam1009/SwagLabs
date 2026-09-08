@@ -212,8 +212,36 @@ test('Funcionamiento Menú Hamburguesa opción Logout', async ({ loggedInPage })
         await expect(loggedInPage).toHaveURL("https://www.saucedemo.com/");
 
     })
+})
+
+// Bug conocido: al hacer Reset App State, el badge del carrito se resetea
+// correctamente pero el botón de los productos agregados no vuelve a "Add to cart"
+test('Funcionamiento Menú hamburguesa opción Reset App State', async ({ loggedInPage }) => {
+    const inventoryPage = new InventoryPage(loggedInPage);
+
+    await test.step('Agregamos productos al carrito y verifixamos el contador', async () => {
+        await inventoryPage.addProductToCart('sauce-labs-bolt-t-shirt');
+
+        await expect(inventoryPage.header.cartBadge).toHaveText('1');
+
+    })
+    await test.step('Click en menú hamburguesa opción Resep App State', async () => {
+        await inventoryPage.header.openMenu();
+        await inventoryPage.header.clickResetAppState();
+
+        await expect(inventoryPage.header.cartBadge).not.toBeVisible();
+
+    })
+
+    await test.step('Verificamos que el botón Remove no vuelve a Add to cart (bug)', async () => {
+
+        await expect(inventoryPage.getRemoveButton('sauce-labs-bolt-t-shirt')).toBeVisible();
+        await expect(inventoryPage.getAddProductToCartButton('sauce-labs-bolt-t-shirt')).not.toBeVisible();
+
+    })
 
 })
+
 
 
 

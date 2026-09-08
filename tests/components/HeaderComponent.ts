@@ -7,6 +7,7 @@ export class HeaderComponent {
     readonly openMenuButton: Locator;
     readonly allItemsLink: Locator;
     readonly logoutLink: Locator;
+    readonly resetAppState: Locator;
 
 
     constructor(page: Page) {
@@ -16,6 +17,7 @@ export class HeaderComponent {
         this.openMenuButton = page.getByRole('button', { name: 'Open Menu' })
         this.allItemsLink = page.getByTestId('inventory-sidebar-link');
         this.logoutLink = page.getByTestId('logout-sidebar-link');
+        this.resetAppState = page.getByTestId('reset-sidebar-link');
 
     }
 
@@ -29,6 +31,10 @@ export class HeaderComponent {
 
     async clickLogout(){
         await this.logoutLink.click();
+    }
+
+    async clickResetAppState(){
+        await this.resetAppState.click();
     }
 
 }
