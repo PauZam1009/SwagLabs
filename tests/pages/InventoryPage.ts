@@ -1,9 +1,9 @@
 import { Page, Locator } from '@playwright/test';
+import { HeaderComponent } from '../components/HeaderComponent';
 
 export class InventoryPage {
     readonly page: Page;
-    readonly cartBadge: Locator;
-    readonly cartLink: Locator;
+    readonly header: HeaderComponent;
     readonly sortDropdown: Locator;
     readonly productPrices: Locator;
 
@@ -11,8 +11,7 @@ export class InventoryPage {
 
     constructor(page: Page) {
         this.page = page;
-        this.cartBadge = page.getByTestId('shopping-cart-badge');
-        this.cartLink = page.getByTestId('shopping-cart-link'); 
+        this.header = new HeaderComponent(page);
         this.sortDropdown = page.getByTestId('product-sort-container');
         this.productPrices = page.getByTestId('inventory-item-price');
         
@@ -27,7 +26,7 @@ export class InventoryPage {
     }
 
     async goToCart() {
-        await this.cartLink.click();
+        await this.header.cartLink.click();
     }
 
     async sortProductsBy(sortValue: string) {

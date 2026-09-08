@@ -45,7 +45,7 @@ test('Agregar productos al carrito', async ({ loggedInPage }) => {
     await inventoryPage.addProductToCart('sauce-labs-backpack');
     await inventoryPage.addProductToCart('sauce-labs-onesie');
 
-    await expect(inventoryPage.cartBadge).toHaveText('2');
+    await expect(inventoryPage.header.cartBadge).toHaveText('2');
 
 })
 
@@ -59,7 +59,7 @@ test('Realizar compra completa', async ({ loggedInPage }) => {
         await inventoryPage.addProductToCart('sauce-labs-fleece-jacket');
         await inventoryPage.addProductToCart('sauce-labs-onesie');
 
-        await expect(inventoryPage.cartBadge).toHaveText('3');
+        await expect(inventoryPage.header.cartBadge).toHaveText('3');
 
     });
 
@@ -115,7 +115,7 @@ test('El botón de Continue Shopping funciona', async ({ loggedInPage }) => {
     await test.step('Se agrega un producto al carrito', async () => {
         await inventoryPage.addProductToCart('sauce-labs-backpack');
 
-        await expect(inventoryPage.cartBadge).toHaveText('1');
+        await expect(inventoryPage.header.cartBadge).toHaveText('1');
     })
 
     await test.step('Entramos al carrito y continuamos comprando', async () => {
@@ -123,7 +123,7 @@ test('El botón de Continue Shopping funciona', async ({ loggedInPage }) => {
         await inventoryPage.goToCart();
         await cartPage.clickContinueShopping();
 
-        await expect(inventoryPage.cartBadge).toHaveText('1');
+        await expect(inventoryPage.header.cartBadge).toHaveText('1');
         await expect(loggedInPage).toHaveURL("https://www.saucedemo.com/inventory.html");
 
     })
@@ -136,7 +136,7 @@ test('Funcionamiento botón Remove desde inventory', async ({ loggedInPage }) =>
     await test.step('Agregamos un producto y confirmamos que quedó en el carrito', async () => {
         await inventoryPage.addProductToCart('sauce-labs-onesie');
 
-        await expect(inventoryPage.cartBadge).toHaveText('1');
+        await expect(inventoryPage.header.cartBadge).toHaveText('1');
         await expect(inventoryPage.getRemoveButton('sauce-labs-onesie')).toBeVisible();
 
     })
@@ -144,12 +144,43 @@ test('Funcionamiento botón Remove desde inventory', async ({ loggedInPage }) =>
     await test.step('Removemos el producto y confirmamos que se sacó del carrito', async () => {
         await inventoryPage.removeProduct('sauce-labs-onesie');
 
-        await expect(inventoryPage.cartBadge).not.toBeVisible();
+        await expect(inventoryPage.header.cartBadge).not.toBeVisible();
         await expect(inventoryPage.getAddProductToCartButton('sauce-labs-onesie')).toBeVisible();
     })
-    
 
 })
+
+test('Funcionamiento botón Remove desde cartlink', async ({ loggedInPage }) => {
+    const cartPage = new CartPage(loggedInPage);
+    const inventoryPage = new InventoryPage(loggedInPage);
+
+    await test.step('Agregamos dos productos y damos click en el carrito', async () => {
+        await inventoryPage.addProductToCart('sauce-labs-fleece-jacket');
+        await inventoryPage.addProductToCart('sauce-labs-bolt-t-shirt');
+        await inventoryPage.goToCart();
+
+        await expect(loggedInPage).toHaveURL("https://www.saucedemo.com/cart.html");
+        await expect(cartPage.header.cartBadge).toHaveText('2');
+        await expect(cartPage.getRemoveButton('sauce-labs-fleece-jacket')).toBeVisible();
+        await expect(cartPage.getRemoveButton('sauce-labs-bolt-t-shirt')).toBeVisible();
+    })
+
+    await test.step('Removemos un producto y el carrito baja a 1', async () => {
+        await cartPage.removeProduct('sauce-labs-fleece-jacket');
+
+        await expect(cartPage.header.cartBadge).toHaveText('1');
+    })
+    
+    await test.step('Removemos los dos productos y el contador del carrito desaparece', async () => {
+        await cartPage.removeProduct('sauce-labs-bolt-t-shirt');
+
+        await expect(cartPage.header.cartBadge).not.toBeVisible();
+
+
+    })
+
+})
+
 
 
 
