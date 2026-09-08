@@ -171,7 +171,7 @@ test('Funcionamiento botón Remove desde cartlink', async ({ loggedInPage }) => 
 
         await expect(cartPage.header.cartBadge).toHaveText('1');
     })
-    
+
     await test.step('Removemos los dos productos y el contador del carrito desaparece', async () => {
         await cartPage.removeProduct('sauce-labs-bolt-t-shirt');
 
@@ -189,9 +189,9 @@ test('Funcionamiento Menú Hamburguesa opción All Items', async ({ loggedInPage
         await inventoryPage.addProductToCart('sauce-labs-bolt-t-shirt');
         await inventoryPage.goToCart();
 
-         await expect(loggedInPage).toHaveURL("https://www.saucedemo.com/cart.html");
+        await expect(loggedInPage).toHaveURL("https://www.saucedemo.com/cart.html");
     })
-    
+
     await test.step('Abrimos el menu Hamburguesa y seleccionamos All Items', async () => {
         await cartPage.header.openMenu();
         await cartPage.header.clickAllItems();
@@ -199,8 +199,22 @@ test('Funcionamiento Menú Hamburguesa opción All Items', async ({ loggedInPage
         await expect(loggedInPage).toHaveURL("https://www.saucedemo.com/inventory.html");
         await expect(cartPage.header.cartBadge).toHaveText('2');
     })
-    
 })
+
+test('Funcionamiento Menú Hamburguesa opción Logout', async ({ loggedInPage }) => {
+    const inventoryPage = new InventoryPage(loggedInPage);
+
+    await test.step('En la página de inventory, abrir menú hamburguesa y dar click en Logout', async () => {
+        await inventoryPage.header.openMenu();
+        await inventoryPage.header.clickLogout();
+
+        await expect(loggedInPage).toHaveTitle('Swag Labs');
+        await expect(loggedInPage).toHaveURL("https://www.saucedemo.com/");
+
+    })
+
+})
+
 
 
 
