@@ -10,7 +10,7 @@ test('Navegar a Swag Labs y validar el titulo ', async ({ page }) => {
         await page.goto('');
 
         await expect(page).toHaveTitle('Swag Labs');
-    }); 
+    });
 
 
 })
@@ -35,25 +35,25 @@ test('Login con credenciales inválidas', async ({ page }) => {
 
 
         await expect(page.getByTestId('error')).toHaveText('Epic sadface: Username and password do not match any user in this service');
-        
+
     });
 })
 
 test('Agregar productos al carrito', async ({ loggedInPage }) => {
-        const inventoryPage = new InventoryPage(loggedInPage);
-    
-        await inventoryPage.addProductToCart('sauce-labs-backpack');
-        await inventoryPage.addProductToCart('sauce-labs-onesie');
+    const inventoryPage = new InventoryPage(loggedInPage);
 
-        await expect(inventoryPage.cartBadge).toHaveText('2');
-    
+    await inventoryPage.addProductToCart('sauce-labs-backpack');
+    await inventoryPage.addProductToCart('sauce-labs-onesie');
+
+    await expect(inventoryPage.cartBadge).toHaveText('2');
+
 })
 
 test('Realizar compra completa', async ({ loggedInPage }) => {
     const inventoryPage = new InventoryPage(loggedInPage);
     const cartPage = new CartPage(loggedInPage);
     const checkoutPage = new CheckoutPage(loggedInPage);
-    
+
     await test.step('Agregar 3 productos al carrito ', async () => {
         await inventoryPage.addProductToCart('sauce-labs-backpack');
         await inventoryPage.addProductToCart('sauce-labs-fleece-jacket');
@@ -68,19 +68,19 @@ test('Realizar compra completa', async ({ loggedInPage }) => {
         await inventoryPage.goToCart();
         await cartPage.goToCheckout();
     });
-    
+
     await test.step('Llenamos el formulario de envío', async () => {
 
         await checkoutPage.fillCheckoutInfo('Paula', 'Zambrano', '08205');
-        
+
     });
     await test.step('Finalizar compra', async () => {
         await checkoutPage.clickContinue();
         await checkoutPage.clickFinish();
 
-        await expect (checkoutPage.confirmationMessage).toHaveText('Thank you for your order!');
+        await expect(checkoutPage.confirmationMessage).toHaveText('Thank you for your order!');
     })
-    
+
 })
 
 test('Dar click en el producto Verificar detalle y precio', async ({ loggedInPage }) => {
@@ -93,7 +93,7 @@ test('Dar click en el producto Verificar detalle y precio', async ({ loggedInPag
         await expect(productDetailPage.itemDesc).toContainText('bike at night');
         await expect(productDetailPage.itemPrice).toHaveText('$9.99');
     })
-    
+
 })
 
 test('Ordenar productos en el inventario de menor a mayor costo', async ({ loggedInPage }) => {
@@ -102,10 +102,55 @@ test('Ordenar productos en el inventario de menor a mayor costo', async ({ logge
     await test.step('Seleccionamos la opcíon de menor a mayor precio', async () => {
         await inventoryPage.sortProductsBy('lohi');
 
-        await expect (inventoryPage.productPrices.first()).toHaveText('$7.99');
-        await expect (inventoryPage.productPrices.last()).toHaveText('$49.99');
+        await expect(inventoryPage.productPrices.first()).toHaveText('$7.99');
+        await expect(inventoryPage.productPrices.last()).toHaveText('$49.99');
+    })
+
+})
+
+test('El botón de Continue Shopping funciona', async ({ loggedInPage }) => {
+    const inventoryPage = new InventoryPage(loggedInPage);
+    const cartPage = new CartPage(loggedInPage);
+
+    await test.step('Se agrega un producto al carrito', async () => {
+        await inventoryPage.addProductToCart('sauce-labs-backpack');
+
+        await expect(inventoryPage.cartBadge).toHaveText('1');
+    })
+
+    await test.step('Entramos al carrito y continuamos comprando', async () => {
+
+        await inventoryPage.goToCart();
+        await cartPage.clickContinueShopping();
+
+        await expect(inventoryPage.cartBadge).toHaveText('1');
+        await expect(loggedInPage).toHaveURL("https://www.saucedemo.com/inventory.html");
+
+    })
+
+})
+
+test('Funcionamiento botón Remove desde inventory', async ({ loggedInPage }) => {
+    const inventoryPage = new InventoryPage(loggedInPage);
+
+    await test.step('Agregamos un producto y confirmamos que quedó en el carrito', async () => {
+        await inventoryPage.addProductToCart('sauce-labs-onesie');
+
+        await expect(inventoryPage.cartBadge).toHaveText('1');
+        await expect(inventoryPage.getRemoveButton('sauce-labs-onesie')).toBeVisible();
+
+    })
+
+    await test.step('Removemos el producto y confirmamos que se sacó del carrito', async () => {
+        await inventoryPage.removeProduct('sauce-labs-onesie');
+
+        await expect(inventoryPage.cartBadge).not.toBeVisible();
+        await expect(inventoryPage.getAddProductToCartButton('sauce-labs-onesie')).toBeVisible();
     })
     
+
 })
+
+
 
 
