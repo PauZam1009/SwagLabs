@@ -4,6 +4,7 @@ import { InventoryPage } from './pages/InventoryPage';
 import { LoginPage } from './pages/LoginPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { ProductDetailPage } from './pages/ProductDetailPage';
+import { HeaderComponent } from './components/HeaderComponent';
 
 test('Navegar a Swag Labs y validar el titulo ', async ({ page }) => {
     await test.step('Navegamos a Swag Labs', async () => {
@@ -175,11 +176,32 @@ test('Funcionamiento botón Remove desde cartlink', async ({ loggedInPage }) => 
         await cartPage.removeProduct('sauce-labs-bolt-t-shirt');
 
         await expect(cartPage.header.cartBadge).not.toBeVisible();
-
-
     })
 
 })
+
+test('Funcionamiento Menú Hamburguesa opción All Items', async ({ loggedInPage }) => {
+    const cartPage = new CartPage(loggedInPage);
+    const inventoryPage = new InventoryPage(loggedInPage);
+
+    await test.step('Agregamos productos al carrito y damos click', async () => {
+        await inventoryPage.addProductToCart('sauce-labs-fleece-jacket');
+        await inventoryPage.addProductToCart('sauce-labs-bolt-t-shirt');
+        await inventoryPage.goToCart();
+
+         await expect(loggedInPage).toHaveURL("https://www.saucedemo.com/cart.html");
+    })
+    
+    await test.step('Abrimos el menu Hamburguesa y seleccionamos All Items', async () => {
+        await cartPage.header.openMenu();
+        await cartPage.header.clickAllItems();
+
+        await expect(loggedInPage).toHaveURL("https://www.saucedemo.com/inventory.html");
+        await expect(cartPage.header.cartBadge).toHaveText('2');
+    })
+    
+})
+
 
 
 
